@@ -166,11 +166,6 @@ class BaseMethods {
     await this.clickOnElement(this.buttonBuy);
   }
 
-  // async addValue(selector, value) {
-  //   // await this.waitForDisplayed();
-  //   await $(selector).addValue(value);
-  // }
-
   //                    не работает
   // async waitUntilElementAcceptItem(selector, value, timeout) {
   //   await $(selector).waitUntil(
@@ -259,13 +254,11 @@ class BaseMethods {
     await this.clickButtonBuy();
   }
 
-  async checkAfterExchange() {
-    await this.waitForDisplayed(this.currencyRate); // <- не работает (ReferenceError: $ is not defined)
-    const rateElement = await $(this.currencyRate);
-    const rate = await rateElement.getText();
-    const sumToButElement = await $(this.inputExchanger);
-    const sumToBut = await sumToButElement.getText();
-    const result = (await rate) * sumToBut;
+  async checkAfterExchange(sumToBuy) {
+    await this.waitForDisplayed(this.currencyRate);
+    const rate = await $(this.currencyRate).getText();
+    const resultOfExchange = (await rate) * sumToBuy;
+    const result = `${sumToBuy} => ${resultOfExchange}`;
     await this.waitForDisplayed(this.operationResult);
     const operationResult = await $(this.operationResult);
     await expect(operationResult).toHaveText(result);
