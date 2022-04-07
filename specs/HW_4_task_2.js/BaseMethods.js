@@ -29,7 +29,7 @@ class BaseMethods {
     this.columnName = '//div[@tabulator-field="name"][@role="gridcell"]';
     this.columnAge = '//div[@tabulator-field="age"][@role="gridcell"]';
 
-    this.inputExchanger = '#sum-to-buy';
+    this.inputExchanger = '//input[@id="sum-to-buy"]'; // '#sum-to-buy'
     this.script = '#database';
     this.a = '//script[@id="database"][contains(text() , "1")]';
     this.b =
@@ -166,15 +166,78 @@ class BaseMethods {
     await this.clickOnElement(this.buttonBuy);
   }
 
-  async setValue(selector, value) {
-    await this.waitForDisplayed();
-    await $(selector).setValue(value);
-  }
+  // async addValue(selector, value) {
+  //   // await this.waitForDisplayed();
+  //   await $(selector).addValue(value);
+  // }
 
-  async waitUntilElementAcceptItem(selector, value, timeout) {
+  //                    не работает
+  // async waitUntilElementAcceptItem(selector, value, timeout) {
+  //   await $(selector).waitUntil(
+  //     async function () {
+  //       const valueOfElement = await this.getHTML(false);
+  //       console.log(valueOfElement);
+  //       const parseValue = await JSON.parse(valueOfElement);
+  //       console.log(parseValue);
+  //       // for (let i = 0; i < parseValue.length; ++i) {             // <-- один из вариантов
+  //       //   if ((await parseValue[i].num) === `${value}`) {
+  //       //     return true;
+  //       //   }
+  //       // }
+  //       return (await parseValue[0].num) === `${value}`;
+  //     },
+  //     {
+  //       timeout: timeout,
+  //       timeoutMsg: `expected text is different after ${timeout} ms`,
+  //     }
+  //   );
+  // }
+
+  async waitUntilElementAcceptItemOne(selector, timeout) {
     await $(selector).waitUntil(
       async function () {
-        return (await this.getText()) === `${value}`;
+        const valueOfElement = await this.getHTML(false);
+        const parseValue = await JSON.parse(valueOfElement);
+        return (await parseValue[0].num) === '1';
+      },
+      {
+        timeout: timeout,
+        timeoutMsg: `expected text is different after ${timeout} ms`,
+      }
+    );
+  }
+  async waitUntilElementAcceptItemTwo(selector, timeout) {
+    await $(selector).waitUntil(
+      async function () {
+        const valueOfElement = await this.getHTML(false);
+        const parseValue = await JSON.parse(valueOfElement);
+        return (await parseValue[1].num) === '2';
+      },
+      {
+        timeout: timeout,
+        timeoutMsg: `expected text is different after ${timeout} ms`,
+      }
+    );
+  }
+  async waitUntilElementAcceptItemThree(selector, timeout) {
+    await $(selector).waitUntil(
+      async function () {
+        const valueOfElement = await this.getHTML(false);
+        const parseValue = await JSON.parse(valueOfElement);
+        return (await parseValue[2].num) === '3';
+      },
+      {
+        timeout: timeout,
+        timeoutMsg: `expected text is different after ${timeout} ms`,
+      }
+    );
+  }
+  async waitUntilElementAcceptItemFour(selector, timeout) {
+    await $(selector).waitUntil(
+      async function () {
+        const valueOfElement = await this.getHTML(false);
+        const parseValue = await JSON.parse(valueOfElement);
+        return (await parseValue[3].num) === '4';
       },
       {
         timeout: timeout,
@@ -184,25 +247,29 @@ class BaseMethods {
   }
 
   async buyCurrency() {
-    await this.setValue(this.inputExchanger, '1');
-    // await this.waitUntilElementAcceptItem(this.script, 1, 10000);
-    await this.setValue(this.inputExchanger, '2');
-    // await this.waitUntilElementAcceptItem(this.script, 2, 10000);
-    await this.setValue(this.inputExchanger, '3');
-    // await this.waitUntilElementAcceptItem(this.script, 3, 10000);
-    await this.setValue(this.inputExchanger, '4');
-    // await this.waitUntilElementAcceptItem(this.script, 4, 10000);
+    await this.waitForDisplayed(this.inputExchanger);
+    await $(this.inputExchanger).addValue(1);
+    await this.waitUntilElementAcceptItemOne(this.script, 10000);
+    await $(this.inputExchanger).addValue(2);
+    await this.waitUntilElementAcceptItemTwo(this.script, 10000);
+    await $(this.inputExchanger).addValue(3);
+    await this.waitUntilElementAcceptItemThree(this.script, 10000);
+    await $(this.inputExchanger).addValue(4);
+    await this.waitUntilElementAcceptItemFour(this.script, 10000);
     await this.clickButtonBuy();
   }
 
-  // async checkAfterExchange() {
-  //   await this.waitForDisplayed(this.currencyRate);
-  //   const rate = await $(this.currencyRate).getText();
-  //   const sumToBut = await $(this.inputExchanger).getText();
-  //   const result = rate * sumToBut;
-  //   const operationResult = await $(this.operationResult);
-  //   await expect(operationResult).toHaveText(result);
-  // }
+  async checkAfterExchange() {
+    await this.waitForDisplayed(this.currencyRate); // <- не работает (ReferenceError: $ is not defined)
+    const rateElement = await $(this.currencyRate);
+    const rate = await rateElement.getText();
+    const sumToButElement = await $(this.inputExchanger);
+    const sumToBut = await sumToButElement.getText();
+    const result = (await rate) * sumToBut;
+    await this.waitForDisplayed(this.operationResult);
+    const operationResult = await $(this.operationResult);
+    await expect(operationResult).toHaveText(result);
+  }
 }
 
 module.exports = new BaseMethods();
