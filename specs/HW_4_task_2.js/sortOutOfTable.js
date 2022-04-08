@@ -63,3 +63,4 @@ describe('Test for task 2', async function () {
 });
 
 // npx wdio run ./wdio.conf.js
+// npm run test

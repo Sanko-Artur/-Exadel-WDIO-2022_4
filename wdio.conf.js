@@ -17,36 +17,35 @@ const bsCaps = [
       os: 'Windows',
       osVersion: '10',
       local: 'false',
-      seleniumVersion: '3.5.2',
-      userName: process.env.USER,
-      accessKey: process.env.KEY,
-    },
-    browserName: 'Edge',
-    browserVersion: 'latest-beta',
-  },
-  {
-    'bstack:options': {
-      os: 'Windows',
-      osVersion: '10',
-      local: 'false',
-      seleniumVersion: '3.5.2',
-      userName: process.env.USER,
-      accessKey: process.env.KEY,
+      seleniumVersion: '3.10.0',
+      userName: 'bsuser_vAWMJZ',
+      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
     },
     browserName: 'Firefox',
-    browserVersion: 'latest-beta',
+    browserVersion: 'latest',
   },
   {
     'bstack:options': {
       os: 'OS X',
       osVersion: 'Monterey',
       local: 'false',
-      seleniumVersion: '3.14.0',
-      userName: process.env.USER,
-      accessKey: process.env.KEY,
+      seleniumVersion: '3.5.2',
+      userName: 'bsuser_vAWMJZ',
+      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
     },
-    browserName: 'Safari',
-    browserVersion: '15.0',
+    browserName: 'Edge',
+    browserVersion: 'latest',
+  },
+  {
+    'bstack:options': {
+      osVersion: '15',
+      deviceName: 'iPhone XS',
+      realMobile: 'true',
+      local: 'false',
+      userName: 'bsuser_vAWMJZ',
+      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
+    },
+    browserName: 'safari',
   },
 ];
 
@@ -65,15 +64,23 @@ const localCaps = [
 const bsServices = ['browserstack'];
 const localServices = ['chromedriver'];
 exports.config = {
-  user: process.env.USER,
-  key: process.env.KEY,
-  specs: ['./specs/**/asyncDataRecording.js'],
+  user: process.env.BROWSERSTACK_USERNAME,
+  key: process.env.BROWSERSTACK_ACCESS_KEY,
+  services: [
+    [
+      'browserstack',
+      {
+        browserstackLocal: true,
+      },
+    ],
+  ],
+  specs: ['./specs/**/sortOutOfTable.js'],
   exclude: [
     // 'path/to/excluded/files'
   ],
   automationProtocol: 'webdriver',
   maxInstances: 10,
-  capabilities: process.env.HUB === 'bs' ? bsCaps : localCaps,
+  capabilities: process.env.HUB === 'bs' ? localCaps : bsCaps, // bsCaps : localCaps
   // Level of logging verbosity: trace | debug | info | warn | error | silent
   logLevel: 'warn',
   bail: 0,

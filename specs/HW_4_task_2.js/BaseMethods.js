@@ -6,7 +6,7 @@ class BaseMethods {
     this.login = 'walker@jw.com';
     this.password = 'password';
     this.buttonLogin = 'button';
-    this.spinner = '.spinner-border text-light';
+    this.spinner = '//div[@class="spinner-border text-light"]'; //.spinner-border text-light
 
     this.idFilter =
       '//div[contains(text() , "Id")]/following-sibling::div[@class="tabulator-col-sorter"]';
@@ -44,7 +44,7 @@ class BaseMethods {
   }
 
   async openURL() {
-    await browser.maximizeWindow();
+    // await browser.maximizeWindow();
     await browser.url(this.url);
   }
 
@@ -166,73 +166,16 @@ class BaseMethods {
     await this.clickOnElement(this.buttonBuy);
   }
 
-  //                    не работает
-  // async waitUntilElementAcceptItem(selector, value, timeout) {
-  //   await $(selector).waitUntil(
-  //     async function () {
-  //       const valueOfElement = await this.getHTML(false);
-  //       console.log(valueOfElement);
-  //       const parseValue = await JSON.parse(valueOfElement);
-  //       console.log(parseValue);
-  //       // for (let i = 0; i < parseValue.length; ++i) {             // <-- один из вариантов
-  //       //   if ((await parseValue[i].num) === `${value}`) {
-  //       //     return true;
-  //       //   }
-  //       // }
-  //       return (await parseValue[0].num) === `${value}`;
-  //     },
-  //     {
-  //       timeout: timeout,
-  //       timeoutMsg: `expected text is different after ${timeout} ms`,
-  //     }
-  //   );
-  // }
-
-  async waitUntilElementAcceptItemOne(selector, timeout) {
+  async waitUntilElementAcceptItem(selector, value, timeout) {
     await $(selector).waitUntil(
       async function () {
         const valueOfElement = await this.getHTML(false);
         const parseValue = await JSON.parse(valueOfElement);
-        return (await parseValue[0].num) === '1';
-      },
-      {
-        timeout: timeout,
-        timeoutMsg: `expected text is different after ${timeout} ms`,
-      }
-    );
-  }
-  async waitUntilElementAcceptItemTwo(selector, timeout) {
-    await $(selector).waitUntil(
-      async function () {
-        const valueOfElement = await this.getHTML(false);
-        const parseValue = await JSON.parse(valueOfElement);
-        return (await parseValue[1].num) === '2';
-      },
-      {
-        timeout: timeout,
-        timeoutMsg: `expected text is different after ${timeout} ms`,
-      }
-    );
-  }
-  async waitUntilElementAcceptItemThree(selector, timeout) {
-    await $(selector).waitUntil(
-      async function () {
-        const valueOfElement = await this.getHTML(false);
-        const parseValue = await JSON.parse(valueOfElement);
-        return (await parseValue[2].num) === '3';
-      },
-      {
-        timeout: timeout,
-        timeoutMsg: `expected text is different after ${timeout} ms`,
-      }
-    );
-  }
-  async waitUntilElementAcceptItemFour(selector, timeout) {
-    await $(selector).waitUntil(
-      async function () {
-        const valueOfElement = await this.getHTML(false);
-        const parseValue = await JSON.parse(valueOfElement);
-        return (await parseValue[3].num) === '4';
+        for (let i = 0; i < parseValue.length; ++i) {
+          if ((await parseValue[i].num) === `${value}`) {
+            return true;
+          }
+        }
       },
       {
         timeout: timeout,
@@ -244,13 +187,13 @@ class BaseMethods {
   async buyCurrency() {
     await this.waitForDisplayed(this.inputExchanger);
     await $(this.inputExchanger).addValue(1);
-    await this.waitUntilElementAcceptItemOne(this.script, 10000);
+    await this.waitUntilElementAcceptItem(this.script, '1', 10000);
     await $(this.inputExchanger).addValue(2);
-    await this.waitUntilElementAcceptItemTwo(this.script, 10000);
+    await this.waitUntilElementAcceptItem(this.script, '2', 10000);
     await $(this.inputExchanger).addValue(3);
-    await this.waitUntilElementAcceptItemThree(this.script, 10000);
+    await this.waitUntilElementAcceptItem(this.script, '3', 10000);
     await $(this.inputExchanger).addValue(4);
-    await this.waitUntilElementAcceptItemFour(this.script, 10000);
+    await this.waitUntilElementAcceptItem(this.script, '4', 10000);
     await this.clickButtonBuy();
   }
 
