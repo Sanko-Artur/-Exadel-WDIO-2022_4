@@ -11,6 +11,9 @@ const {
 // const build = 'test build';
 // const bsLocal = false;
 // const idleTimeout = 180000;
+const fs = require('fs');
+const path = require('path');
+
 const bsCaps = [
   {
     'bstack:options': {
@@ -18,8 +21,8 @@ const bsCaps = [
       osVersion: '10',
       local: 'false',
       seleniumVersion: '3.10.0',
-      userName: 'bsuser_vAWMJZ',
-      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
+      userName: process.env.BROWSERSTACK_USERNAME,
+      accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
     },
     browserName: 'Firefox',
     browserVersion: 'latest',
@@ -30,8 +33,8 @@ const bsCaps = [
       osVersion: 'Monterey',
       local: 'false',
       seleniumVersion: '3.5.2',
-      userName: 'bsuser_vAWMJZ',
-      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
+      userName: process.env.BROWSERSTACK_USERNAME,
+      accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
     },
     browserName: 'Edge',
     browserVersion: 'latest',
@@ -42,8 +45,8 @@ const bsCaps = [
       deviceName: 'iPhone XS',
       realMobile: 'true',
       local: 'false',
-      userName: 'bsuser_vAWMJZ',
-      accessKey: 'a4zqL5LnxjX5jE4qUdN8',
+      userName: process.env.BROWSERSTACK_USERNAME,
+      accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
     },
     browserName: 'safari',
   },
@@ -74,13 +77,13 @@ exports.config = {
       },
     ],
   ],
-  specs: ['./specs/**/sortOutOfTable.js'],
+  specs: ['./specs/**/asyncDataRecording.js'],
   exclude: [
     // 'path/to/excluded/files'
   ],
   automationProtocol: 'webdriver',
   maxInstances: 10,
-  capabilities: process.env.HUB === 'bs' ? localCaps : bsCaps, // bsCaps : localCaps
+  capabilities: process.env.HUB === 'bs' ? bsCaps : localCaps, // bsCaps : localCaps
   // Level of logging verbosity: trace | debug | info | warn | error | silent
   logLevel: 'warn',
   bail: 0,
@@ -157,8 +160,6 @@ exports.config = {
    * @param {Array.<Object>} capabilities list of capabilities details
    */
   onPrepare: function (config, capabilities) {
-    const fs = require('fs');
-    const path = require('path');
     const directory = 'screenshots';
 
     if (!fs.existsSync(`./${directory}`)) {
@@ -271,12 +272,11 @@ exports.config = {
     { error, result, duration, passed, retries }
   ) {
     if (!passed) {
-      const date = await new Date().toLocaleString();
-      const prepareDate = await date.replace(/,/g, '');
-      const newDate = await prepareDate.replace(/\W/g, '_');
-      const path = await require('path');
-      const nameFile = await path.basename(test.file).replace(/\W/g, '_');
-      const nameTest = await test.title.replace(/\W/g, '_');
+      const date = new Date().toLocaleString();
+      const prepareDate = date.replace(/,/g, '');
+      const newDate = prepareDate.replace(/\W/g, '_');
+      const nameFile = path.basename(test.file).replace(/\W/g, '_');
+      const nameTest = test.title.replace(/\W/g, '_');
 
       await browser.saveScreenshot(
         `./screenshots/Date_${newDate}_FileName_${nameFile}_TestName_${nameTest}.png`

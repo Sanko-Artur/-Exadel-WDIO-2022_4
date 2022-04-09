@@ -66,8 +66,16 @@ class BaseMethods {
     });
   }
 
+  async waitForClickable(selector) {
+    await $(selector).waitForClickable({
+      timeout: 5000,
+      timeoutMsg: `After 5 sec the element: ${selector} is not clickable`,
+    });
+  }
+
   async clickOnElement(selector) {
     await this.waitForDisplayed(selector);
+    await this.waitForClickable(selector);
     await $(selector).click();
   }
 
@@ -147,53 +155,29 @@ class BaseMethods {
     return text;
   }
 
-  async getValueOfcolumnId() {
-    const value = await this.getValueOfcolumn(this.columnId);
-    return value;
-  }
-
-  async getValueOfcolumnName() {
-    const value = await this.getValueOfcolumn(this.columnName);
-    return value;
-  }
-
-  async getValueOfcolumnAge() {
-    const value = await this.getValueOfcolumn(this.columnAge);
-    return value;
-  }
-
   async clickButtonBuy() {
     await this.clickOnElement(this.buttonBuy);
   }
 
-  async waitUntilElementAcceptItem(selector, value, timeout) {
-    await $(selector).waitUntil(
-      async function () {
-        const valueOfElement = await this.getHTML(false);
-        const parseValue = await JSON.parse(valueOfElement);
-        for (let i = 0; i < parseValue.length; ++i) {
-          if ((await parseValue[i].num) === `${value}`) {
-            return true;
-          }
+  async buyCurrency(selectorForInput, sumToBuy, selectorForScript, timeout) {
+    await this.waitForDisplayed(selectorForInput);
+    await this.waitForClickable(selectorForInput);
+    const toString = String(sumToBuy);
+    const splitSum = toString.split('');
+    for (let i = 0; i < splitSum.length; ++i) {
+      await $(selectorForInput).addValue(splitSum[i]);
+      await $(selectorForScript).waitUntil(
+        async function () {
+          const valueOfElement = await this.getHTML(false);
+          const parseValue = JSON.parse(valueOfElement);
+          return parseValue[i].num === `${splitSum[i]}`;
+        },
+        {
+          timeout: timeout,
+          timeoutMsg: `expected text is different after ${timeout} ms`,
         }
-      },
-      {
-        timeout: timeout,
-        timeoutMsg: `expected text is different after ${timeout} ms`,
-      }
-    );
-  }
-
-  async buyCurrency() {
-    await this.waitForDisplayed(this.inputExchanger);
-    await $(this.inputExchanger).addValue(1);
-    await this.waitUntilElementAcceptItem(this.script, '1', 10000);
-    await $(this.inputExchanger).addValue(2);
-    await this.waitUntilElementAcceptItem(this.script, '2', 10000);
-    await $(this.inputExchanger).addValue(3);
-    await this.waitUntilElementAcceptItem(this.script, '3', 10000);
-    await $(this.inputExchanger).addValue(4);
-    await this.waitUntilElementAcceptItem(this.script, '4', 10000);
+      );
+    }
     await this.clickButtonBuy();
   }
 

@@ -4,3 +4,4 @@ debug.mjs
 node_modules
 /specs/test.js
 /allure-report/
+.env
